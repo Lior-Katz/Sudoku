@@ -4,7 +4,9 @@
 
 #include "Cell.h"
 
-Cell::Cell(int size) :
+Cell::Cell(int x, int y, int size) :
+		x(x),
+		y(y),
 		available(std::vector<int>(size)),
 		value(0)
 {
@@ -21,4 +23,13 @@ void Cell::setValue(int newValue)
 	this->value = newValue;
 }
 
+int Cell::getX() const
+{
+	return this->x;
+}
+
+int Cell::getY() const
+{
+	return this->y;
+}
 

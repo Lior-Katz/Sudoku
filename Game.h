@@ -14,14 +14,21 @@ class Game
 {
 private:
 	int size;
+	
+	int boxSize;
+	
 	std::vector<std::vector<Cell>> board;
+	
+	std::vector<Cell*> freeCells;
+	
 	std::stack<Command> moves;
 	
 public:
 	
 	
-	explicit Game(int size) :
-			size(size)
+	explicit Game(int size, int boxSize) :
+			size(size),
+			boxSize(boxSize)
 	{
 	};
 	
@@ -30,6 +37,8 @@ public:
 	void initializeGame();
 	
 	void solve();
+	
+	void updateAvailables();
 	
 };
 
