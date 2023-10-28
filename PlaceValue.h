@@ -6,10 +6,27 @@
 #define SUDOKU_PLACEVALUE_H
 
 #include "Command.h"
+#include "vector"
+#include "stack"
+#include "Board.h"
+#include "DeleteAvailable.h"
+#include "memory"
 
 class PlaceValue : public Command
 {
-	PlaceValue(Cell cell, int value);
+protected:
+	Board& board;
+	
+	std::stack<std::shared_ptr<Command>> deductions;
+	
+	void updateRowAvailables();
+	
+	void updateColumnAvailables();
+	
+	void updateBoxAvailables();
+
+public:
+	PlaceValue(Board& board, Cell& cell, int value);
 	
 	void execute() override;
 	

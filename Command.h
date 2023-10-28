@@ -10,11 +10,15 @@
 class Command
 {
 protected:
-	Cell cell;
-	int value;
+	Cell& cell;
 	
+	int value;
+
 public:
+	Command(Cell& pCell, int value);
+	
 	virtual void execute() = 0;
+	
 	virtual void undo() = 0;
 };
 

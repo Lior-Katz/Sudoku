@@ -14,12 +14,14 @@ private:
 	
 	const int y;
 	
-	std::vector<int> available;
+	std::vector<int> availableValues;
 	
 	int value;
 
 public:
 	explicit Cell(int x, int y, int size);
+	
+	Cell(int x, int y, int size, int value);
 	
 	int getValue() const;
 	
@@ -27,9 +29,15 @@ public:
 	
 	int getY() const;
 	
+	std::vector<int> getAvailableValues() const;
+	
 	void setValue(int newValue);
 	
-	void removeAvailable(int value);
+	void removeAvailableValue(int valueToDelete);
+	
+	void addAvailableValue(int valueToAdd);
+	
+	friend bool operator<(const Cell& first, const Cell& second);
 };
 
 

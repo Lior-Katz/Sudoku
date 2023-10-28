@@ -7,38 +7,40 @@
 
 #include "vector"
 #include "stack"
+#include "memory"
 #include "Cell.h"
 #include "Command.h"
+#include "Board.h"
+
 
 class Game
 {
 private:
-	int size;
-	
-	int boxSize;
-	
-	std::vector<std::vector<Cell>> board;
+	Board board;
 	
 	std::vector<Cell*> freeCells;
 	
-	std::stack<Command> moves;
+	std::stack<std::shared_ptr<Command>> commandLog;
+	
+	bool isSolved();
 	
 public:
 	
 	
-	explicit Game(int size, int boxSize) :
-			size(size),
-			boxSize(boxSize)
+	explicit Game(std::vector<std::vector<Cell>> startingBoard, int size, int boxSize) :
+			board(startingBoard, boxSize, size)
 	{
 	};
+	
 	
 	Game() = delete;
 	
 	void initializeGame();
 	
-	void solve();
+	bool solve();
 	
-	void updateAvailables();
+	
+	
 	
 };
 

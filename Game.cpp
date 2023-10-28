@@ -3,66 +3,128 @@
 //
 
 #include "Game.h"
+#include "PlaceValue.h"
+#include "DeleteAvailable.h"
+#include <algorithm>
 
-void checkRow(std::vector<std::vector<Cell>>& board, int size, Cell& cell);
+void checkRow(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog);
 
-void checkColumn(std::vector<std::vector<Cell>>& board, int size, Cell& cell);
+void checkColumn(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog);
 
-void checkBox(std::vector<std::vector<Cell>>& board, int size, int boxSize, Cell& cell);
+void checkBox(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog);
 
-void Game::updateAvailables()
+void Game::initializeGame()
 {
+	for (Cell& cell : board)
+	{
+		if (cell.getValue() == 0)
+		{
+			freeCells.push_back(&cell);
+		}
+	}
+	
 	for (Cell* pCell : freeCells)
 	{
-		checkRow(board, size, *pCell);
-		checkColumn(board, size, *pCell);
-		checkBox(board, size, boxSize, *pCell);
+		checkRow(board, *pCell, commandLog);
+		checkColumn(board, *pCell, commandLog);
+		checkBox(board, *pCell, commandLog);
 	}
+	
+	std::sort(freeCells.begin(), freeCells.end());
 }
 
-void checkRow(std::vector<std::vector<Cell>>& board, int size, Cell& cell)
+bool Game::solve()
 {
-	for (int i = 0; i < size; ++i)
+	initializeGame();
+	
+	return isSolved();
+}
+
+bool Game::isSolved()
+{
+	if (freeCells.empty())
 	{
-		if( i == cell.getX())
+		return true;
+	}
+	
+	Cell& cell = *freeCells.front();
+	if (cell.getAvailableValues().empty())
+	{
+		return false;
+	}
+	
+	freeCells.erase(freeCells.begin());
+	for (int value : cell.getAvailableValues())
+	{
+		std::shared_ptr<Command> placeValue(new PlaceValue(board, cell, value));
+		placeValue->execute();
+		commandLog.push(placeValue);
+		std::sort(freeCells.begin(), freeCells.end());
+		
+		if (isSolved())
+		{
+			return true;
+		}
+		
+		commandLog.top()->undo();
+		commandLog.pop();
+		std::sort(freeCells.begin(), freeCells.end());
+	}
+	freeCells.push_back(&cell);
+	return false;
+}
+
+//TODO: get rid of code duplication between checking row, column and box; in PlaceValue::execute()
+void checkRow(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog)
+{
+	for (int i = 0; i < board.getBoardSize(); ++i)
+	{
+		if (i == cell.getX())
+		{
 			continue;
+		}
 		
 		if (board[i][cell.getY()].getValue() != 0)
 		{
-			cell.removeAvailable(board[i][cell.getY()].getValue());
+			cell.removeAvailableValue(board[i][cell.getY()].getValue());
 		}
 	}
 }
 
-void checkColumn(std::vector<std::vector<Cell>>& board, int size, Cell& cell)
+void checkColumn(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog)
 {
-	for (int i = 0; i < size; ++i)
+	for (int i = 0; i < board.getBoardSize(); ++i)
 	{
-		if( i == cell.getY())
+		if (i == cell.getY())
+		{
 			continue;
+		}
 		
 		if (board[cell.getX()][i].getValue() != 0)
 		{
-			cell.removeAvailable(board[cell.getY()][i].getValue());
+			
+			cell.removeAvailableValue(board[cell.getX()][i].getValue());
 		}
 	}
 }
 
-void checkBox(std::vector<std::vector<Cell>>& board, int size, int boxSize, Cell& cell)
+void checkBox(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog)
 {
-	for (int i = 0; i < boxSize; ++i)
+	for (int i = 0; i < board.getBoxSize(); ++i)
 	{
-		for (int j = 0; j < boxSize; ++j)
+		for (int j = 0; j < board.getBoxSize(); ++j)
 		{
-			int x = cell.getX() - cell.getX() % boxSize + i;
-			int y = cell.getY() - cell.getY() % boxSize + j;
+			int x = cell.getX() - cell.getX() % board.getBoxSize() + i;
+			int y = cell.getY() - cell.getY() % board.getBoxSize() + j;
 			
-			if(cell.getX() == x && cell.getY() == y)
+			if (cell.getX() == x && cell.getY() == y)
+			{
 				continue;
+			}
 			
 			if (board[x][y].getValue() != 0)
 			{
-				cell.removeAvailable(board[x][y].getValue());
+				cell.removeAvailableValue(board[x][y].getValue());
 			}
 		}
 	}

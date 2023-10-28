@@ -3,3 +3,10 @@
 //
 
 #include "Command.h"
+
+Command::Command(Cell& pCell, int value) :
+		cell(pCell),
+		value(value)
+{
+
+}
