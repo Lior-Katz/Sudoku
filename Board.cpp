@@ -4,6 +4,62 @@
 
 #include "Board.h"
 
+
+Board::Board(std::vector<std::vector<Cell>>& board) :
+		board(board)
+{
+	this->boardSize = board.size();
+	int size = 0;
+	while (size * size != boardSize)
+	{
+		++size;
+	}
+	this->boxSize = size;
+}
+
+int Board::getBoardSize() const
+{
+	return this->boardSize;
+}
+
+int Board::getBoxSize() const
+{
+	return this->boxSize;
+}
+
+const std::vector<Cell>& Board::operator[](int x) const
+{
+	return this->board[x];
+}
+
+std::vector<Cell>& Board::operator[](int x)
+{
+	return this->board[x];
+}
+
+bool operator==(const Board& first, const Board& second)
+{
+	if (first.getBoardSize() != second.getBoardSize())
+	{
+		throw std::invalid_argument("Invalid comparison between boards of different sizes");
+	}
+	
+	for (auto it1 = first.begin(), it2 = second.begin(); it1 != first.end(); ++it1, ++it2)
+	{
+		if (*it1 != *it2)
+		{
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+bool operator!=(const Board& first, const Board& second)
+{
+	return !(first == second);
+}
+
 Cell& Board::Iterator::operator*()
 {
 	if (x == itBoard.getBoardSize() || y == itBoard.getBoardSize())
@@ -32,38 +88,74 @@ Board::Iterator& Board::Iterator::operator++()
 
 bool Board::Iterator::operator!=(const Board::Iterator& iterator) const
 {
-	if ((this->x >= itBoard.getBoardSize() || this->y >= itBoard.getBoardSize()) && (iterator.x >= iterator.itBoard
-	.getBoardSize() || iterator.y >= iterator.itBoard.getBoardSize()))
+	if ((this->x >= itBoard.getBoardSize() || this->y >= itBoard.getBoardSize()) && (iterator.x >= iterator.itBoard.getBoardSize() || iterator.y >= iterator.itBoard.getBoardSize()))
 	{
 		return false;
 	}
-	return ! (this->x == iterator.x && this->y == iterator.y);
+	return !(this->x == iterator.x && this->y == iterator.y);
 }
 
-Board::Board(std::vector<std::vector<Cell>>& board, int boxSize, int boardSize) :
-		boardSize(boardSize),
-		boxSize(boxSize),
-		board(board)
+const Cell& Board::ConstIterator::operator*() const
 {
-
+	if (x == itBoard.getBoardSize() || y == itBoard.getBoardSize())
+	{
+		throw std::runtime_error("Invalid dereference");
+	}
+	
+	return itBoard[x][y];
 }
 
-int Board::getBoardSize() const
+Board::ConstIterator& Board::ConstIterator::operator++()
 {
-	return this->boardSize;
+	if (this->x == itBoard.getBoardSize() || this->y == itBoard.getBoardSize())
+	{
+		throw std::runtime_error("");
+	}
+	++this->x;
+	if (this->x == itBoard.getBoardSize())
+	{
+		this->x = 0;
+		++this->y;
+	}
+	
+	return *this;
 }
 
-int Board::getBoxSize() const
+bool Board::ConstIterator::operator!=(const Board::ConstIterator& iterator) const
 {
-	return this->boxSize;
+	if ((this->x >= itBoard.getBoardSize() || this->y >= itBoard.getBoardSize()) && (iterator.x >= iterator.itBoard.getBoardSize() || iterator.y >= iterator.itBoard.getBoardSize()))
+	{
+		return false;
+	}
+	return !(this->x == iterator.x && this->y == iterator.y);
 }
 
-const std::vector<Cell>& Board::operator[](int x) const
+std::ostream& operator<<(std::ostream& os, const Board& board)
 {
-	return this->board[x];
-}
-
-std::vector<Cell>& Board::operator[](int x)
-{
-	return this->board[x];
+	int row = 0, column = 0;
+	for (const Cell& cell : board)
+	{
+		++column;
+		os << cell;
+		if (column == board.getBoardSize())
+		{
+			os << std::endl;
+			column = 0;
+			++row;
+			if (row % board.getBoxSize() == 0)
+			{
+				for (int i = 0; i < board.getBoardSize(); ++i)
+				{
+					os << "- ";
+				}
+				os << std::endl;
+			}
+		}
+		else if (column % board.getBoxSize() == 0)
+		{
+			os << "| ";
+		}
+		
+	}
+	return os;
 }

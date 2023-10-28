@@ -5,12 +5,16 @@
 #ifndef SUDOKU_GAME_H
 #define SUDOKU_GAME_H
 
-#include "vector"
-#include "stack"
-#include "memory"
+#include <vector>
+#include <stack>
+#include <memory>
 #include "Cell.h"
 #include "Command.h"
+#include <iostream>
+#include "PlaceValue.h"
 #include "Board.h"
+#include "DeleteAvailable.h"
+#include <algorithm>
 
 
 class Game
@@ -22,25 +26,24 @@ private:
 	
 	std::stack<std::shared_ptr<Command>> commandLog;
 	
-	bool isSolved();
+	bool isSolved(int min = 0, int current = 0);
+	
+	void initializeGame();
 	
 public:
 	
 	
-	explicit Game(std::vector<std::vector<Cell>> startingBoard, int size, int boxSize) :
-			board(startingBoard, boxSize, size)
+	explicit Game(std::vector<std::vector<Cell>> startingBoard) :
+			board(startingBoard)
 	{
 	};
 	
 	
 	Game() = delete;
 	
-	void initializeGame();
+	bool solve(int min = 0, int current = 0);
 	
-	bool solve();
-	
-	
-	
+	const Board& getBoard() const;
 	
 };
 

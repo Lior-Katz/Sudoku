@@ -8,6 +8,7 @@
 #include <vector>
 #include "stdexcept"
 #include "Cell.h"
+#include "ostream"
 
 class Board
 {
@@ -19,7 +20,7 @@ private:
 	std::vector<std::vector<Cell>> board;
 
 public:
-	Board(std::vector<std::vector<Cell>>& board, int boxSize, int boardSize);
+	explicit Board(std::vector<std::vector<Cell>>& board);
 	
 	int getBoardSize() const;
 	
@@ -65,7 +66,48 @@ public:
 		return Iterator(*this, boardSize, boardSize);
 	}
 	
+	class ConstIterator
+	{
+	private:
+		const Board& itBoard;
+		
+		int x, y;
+		
+		explicit ConstIterator(const Board& itBoard, int x, int y) :
+				itBoard(itBoard),
+				x(x),
+				y(y)
+		{
+		}
+		
+		friend class Board;
+	
+	public:
+		const Cell& operator*() const;
+		
+		ConstIterator& operator++();
+		
+		bool operator!=(const ConstIterator& iterator) const;
+		
+		ConstIterator() = delete;
+	};
+	
+	ConstIterator begin() const
+	{
+		return ConstIterator(*this, 0, 0);
+	}
+	
+	ConstIterator end() const
+	{
+		return ConstIterator(*this, boardSize, boardSize);
+	}
+	
 };
 
+std::ostream& operator<<(std::ostream& os, const Board& board);
+
+bool operator==(const Board& first, const Board& second);
+
+bool operator!=(const Board& first, const Board& second);
 
 #endif //SUDOKU_BOARD_H

@@ -3,9 +3,7 @@
 //
 
 #include "Game.h"
-#include "PlaceValue.h"
-#include "DeleteAvailable.h"
-#include <algorithm>
+
 
 void checkRow(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog);
 
@@ -30,23 +28,29 @@ void Game::initializeGame()
 		checkBox(board, *pCell, commandLog);
 	}
 	
-	std::sort(freeCells.begin(), freeCells.end());
+	std::sort(freeCells.begin(), freeCells.end(), [](const Cell* pCell1, const Cell* pCell2) {
+		return pCell1->getAvailableValues().size() < pCell2->getAvailableValues().size();
+	});
 }
 
-bool Game::solve()
+bool Game::solve(int min, int current)
 {
 	initializeGame();
 	
-	return isSolved();
+	return isSolved(min, current);
 }
 
-bool Game::isSolved()
+bool Game::isSolved(int min, int current)
 {
 	if (freeCells.empty())
 	{
+		//std::cout << this->board;
 		return true;
 	}
-	
+	if( min != 0 && current >= min)
+	{
+		std::cout << board<< std::endl << std::endl << std::endl;
+	}
 	Cell& cell = *freeCells.front();
 	if (cell.getAvailableValues().empty())
 	{
@@ -59,9 +63,11 @@ bool Game::isSolved()
 		std::shared_ptr<Command> placeValue(new PlaceValue(board, cell, value));
 		placeValue->execute();
 		commandLog.push(placeValue);
-		std::sort(freeCells.begin(), freeCells.end());
+		std::sort(freeCells.begin(), freeCells.end(), [](const Cell* pCell1, const Cell* pCell2) {
+			return pCell1->getAvailableValues().size() < pCell2->getAvailableValues().size();
+		});
 		
-		if (isSolved())
+		if (isSolved(min, current))
 		{
 			return true;
 		}
@@ -72,6 +78,11 @@ bool Game::isSolved()
 	}
 	freeCells.push_back(&cell);
 	return false;
+}
+
+const Board& Game::getBoard() const
+{
+	return this->board;
 }
 
 //TODO: get rid of code duplication between checking row, column and box; in PlaceValue::execute()

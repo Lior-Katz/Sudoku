@@ -5,8 +5,10 @@
 #ifndef SUDOKU_CELL_H
 #define SUDOKU_CELL_H
 
-#include "vector"
-#include "numeric"
+#include <vector>
+#include <numeric>
+#include <ostream>
+
 class Cell
 {
 private:
@@ -40,5 +42,8 @@ public:
 	friend bool operator<(const Cell& first, const Cell& second);
 };
 
+std::ostream& operator<<(std::ostream& os, const Cell& cell);
+
+bool operator!=(const Cell& first, const Cell& second);
 
 #endif //SUDOKU_CELL_H

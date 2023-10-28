@@ -19,7 +19,7 @@ Cell::Cell(int x, int y, int size, int value) :
 		availableValues(std::vector<int>(size)),
 		value(value)
 {
-
+	std::iota(availableValues.begin(), availableValues.end(), 1);
 }
 
 int Cell::getValue() const
@@ -75,6 +75,17 @@ std::vector<int> Cell::getAvailableValues() const
 bool operator<(const Cell& first, const Cell& second)
 {
 	return first.availableValues.size() < second.availableValues.size();
+}
+
+bool operator!=(const Cell& first, const Cell& second)
+{
+	return first.getValue() != second.getValue();
+}
+
+std::ostream& operator<<(std::ostream& os, const Cell& cell)
+{
+	os << cell.getValue() << " ";
+	return os;
 }
 
 
