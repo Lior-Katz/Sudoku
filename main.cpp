@@ -3,12 +3,21 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <windows.h>
 
 using namespace std;
 
 vector<vector<Cell>> createBoard(const string& desc);
 
-void testSolver(const string& fileName);
+void testSolver(vector<tuple<int, int> (*)(const string& fileName)> tests);
+
+vector<string> get_all_files_names_within_folder(const string& folder);
+
+tuple<int, int> test1(const string& folder);
+
+tuple<int, int> test2(const string& folder);
+
+bool runTest(const string& puzzleStr, const string& solutionStr, int total);
 
 vector<vector<Cell>> createBoard(const string& desc)
 {
@@ -25,10 +34,6 @@ vector<vector<Cell>> createBoard(const string& desc)
 		for (int row = 0; row < size; ++row)
 		{
 			int value = desc[row * size + column] - '0';
-			if (value == '.' - '0')
-			{
-				value = 0;
-			}
 			colVec.push_back(Cell(column, row, size, value));
 		}
 		board.push_back(colVec);
@@ -37,57 +42,185 @@ vector<vector<Cell>> createBoard(const string& desc)
 	return board;
 }
 
-void testSolver(const string& fileName)
+bool runTest(const string& puzzleStr, const string& solutionStr, int total)
 {
 	ofstream out("results", ios::app);
+	
+	vector<vector<Cell>> puzzle = createBoard(puzzleStr);
+	vector<vector<Cell>> solution = createBoard(solutionStr);
+	Game game(puzzle);
+	game.solve();
+	
+	if (solutionStr.empty())
+	{
+		if (game.getBoard() != Board(puzzle))
+		{
+			out << "Failed test: " << total << endl;
+			out << "solved puzzle:" << endl << game.getBoard() << endl;
+			out << "correct solution" << endl << "This puzzle has no solution. expexted solved puzzle to be identical"
+												 " to initial condition:" << Board(puzzle) << endl << endl;
+			return false;
+		}
+		return true;
+	}
+	if (game.getBoard() != Board(solution))
+	{
+		out << "Failed puzzle: " << total << endl;
+		out << "solved puzzle:" << endl << game.getBoard() << endl;
+		out << "correct solution" << endl << Board(solution) << endl << endl;
+		return false;
+	}
+	return true;
+}
+
+tuple<int, int> test1(const string& folder)
+{
+	vector<string> sudokuFilesNames = get_all_files_names_within_folder(folder + "\\sudokus");
+	vector<string> solutionFiles = get_all_files_names_within_folder(folder + "\\solutions");
+	
+	int total = 0, failure = 0;
+	
+	for (string& sudokuFileName : sudokuFilesNames)
+	{
+		++total;
+		ifstream puzzleFile(folder + "\\sudokus" + "\\" + sudokuFileName);
+		string solutionFileName = sudokuFileName;
+		solutionFileName.insert(sudokuFileName.size() - 4, "_s");
+		ifstream solutionFile(folder + "\\solutions" + "\\" + solutionFileName);
+		
+		string line, puzzleStr, solutionStr;
+		while (getline(puzzleFile, line))
+		{
+			line.erase(remove_if(line.begin(), line.end(), [](char c) {
+				return (c == '\r' || c == '\t' || c == ' ' || c == '\n');
+			}), line.end());
+			puzzleStr += line;
+		}
+		while (getline(solutionFile, line))
+		{
+			if (line == "")
+			{
+				break;
+			}
+			line.erase(remove_if(line.begin(), line.end(), [](char c) {
+				return (c == '\r' || c == '\t' || c == ' ' || c == '\n' || c == '|' || c == '-');
+			}), line.end());
+			line = line.substr(0, line.find('='));
+			solutionStr += line;
+		}
+		if (!runTest(puzzleStr, solutionStr, total))
+		{
+			++failure;
+		}
+	}
+	return {total, failure};
+}
+
+tuple<int, int> test2(const string& folder)
+{
 	int failure = 0;
 	int total = 0;
-	ifstream puzzlesFile(fileName);
+	ifstream puzzlesFile(folder + "\\test_puzzles.txt");
 	string line;
 	
 	while (getline(puzzlesFile, line))
 	{
 		++total;
 		
-		vector<string> desc(2);
+		string puzzleStr, solutionStr;
 		
 		stringstream ss(line);
-		getline(ss, desc[0], ':');
-		getline(ss, desc[1], ':');
+		getline(ss, puzzleStr, ':');
+		getline(ss, solutionStr, ':');
+		replace(puzzleStr.begin(), puzzleStr.end(), '.', '0');
+		replace(solutionStr.begin(), solutionStr.end(), '.', '0');
 		
-		vector<vector<Cell>> puzzle = createBoard(desc[0]);
-		vector<vector<Cell>> solution = createBoard(desc[1]);
-		Game game(puzzle);
-		game.solve();
-		if (desc[1].empty())
+		if (!runTest(puzzleStr, solutionStr, total))
 		{
-			if (game.getBoard() != Board(puzzle))
-			{
-				out << "Failed test: " << total << endl;
-				out << "solved puzzle:" << endl << game.getBoard() << endl;
-				out << "correct solution" << endl
-					<< "This puzzle has no solution. expexted solved puzzle to be identical"
-					   " to initial condition:" << Board(puzzle) << endl << endl;
-				++failure;
-			}
-			continue;
-		}
-		if (game.getBoard() != Board(solution))
-		{
-			out << "Failed test: " << total << endl;
-			out << "solved puzzle:" << endl << game.getBoard() << endl;
-			out << "correct solution" << endl << Board(solution) << endl << endl;
 			++failure;
 		}
+		
+	}
+	return {total, failure};
+}
+
+tuple<int, int> test3(const string& folder)
+{
+	int failure = 0;
+	int total = 0;
+	ifstream puzzlesFile(folder + "\\tests.csv");
+	string line;
+	string temp;
+	getline(puzzlesFile, temp);
+	while (getline(puzzlesFile, line) && total < 1500000)
+	{
+		++total;
+		
+		string puzzleStr, solutionStr;
+		
+		stringstream ss(line);
+		getline(ss, temp, ',');
+		total = stoi(temp);
+		getline(ss, puzzleStr, ',');
+		getline(ss, solutionStr, ',');
+		replace(puzzleStr.begin(), puzzleStr.end(), '.', '0');
+		replace(solutionStr.begin(), solutionStr.end(), '.', '0');
+		
+		if (!runTest(puzzleStr, solutionStr, total))
+		{
+			++failure;
+		}
+		if (total % 16384 == 0)
+		{
+			cout << "test " << total << endl << "failures: " << failure << endl;
+		}
+		
+	}
+	return {total, failure};
+}
+
+void testSolver(vector<tuple<int, int> (*)(const string& fileName)> tests)
+{
+	ofstream out("results");
+	int testNum = 1;
+	for (auto func : tests)
+	{
+		int total = 0, failure = 0;
+		tie(total, failure) = func("Test" + to_string(testNum));
+		out << "Test " << testNum << " results:" << endl;
+		out << "Total games played:" << total << endl;
+		out << "Failed: " << failure << endl << endl;
+		++testNum;
 	}
 	
-	out << "Total games played:" << total << endl;
-	out << "Failed: " << failure << endl;
+}
+
+vector<string> get_all_files_names_within_folder(const string& folder)
+{
+	vector<string> names;
+	string search_path = folder + "/*.*";
+	WIN32_FIND_DATA fd;
+	HANDLE hFind = ::FindFirstFile(search_path.c_str(), &fd);
+	if (hFind != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			// read all (real) files in current folder
+			// , delete '!' read other 2 default folder . and ..
+			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			{
+				names.push_back(fd.cFileName);
+			}
+		} while (::FindNextFile(hFind, &fd));
+		::FindClose(hFind);
+	}
+	return names;
 }
 
 int main()
 {
-	testSolver("test_puzzles.txt");
+	vector<tuple<int, int> (*)(const string& fileName)> tests = {test1, test2, test3};
+	testSolver(tests);
 	return 0;
 }
 
