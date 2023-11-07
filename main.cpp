@@ -8,9 +8,7 @@ using namespace std;
 
 vector<vector<Cell>> createBoard(const string& desc);
 
-vector<string> readFile(const string& fileName);
-
-bool testSolver(const string& fileName);
+void testSolver(const string& fileName);
 
 vector<vector<Cell>> createBoard(const string& desc)
 {
@@ -39,12 +37,7 @@ vector<vector<Cell>> createBoard(const string& desc)
 	return board;
 }
 
-vector<string> readFile(const string& fileName)
-{
-
-}
-
-bool testSolver(const string& fileName)
+void testSolver(const string& fileName)
 {
 	ofstream out("results", ios::app);
 	int failure = 0;
@@ -90,29 +83,11 @@ bool testSolver(const string& fileName)
 	
 	out << "Total games played:" << total << endl;
 	out << "Failed: " << failure << endl;
-	
 }
 
 int main()
 {
-	
 	testSolver("test_puzzles.txt");
-
-//	vector<vector<Cell>> board1 = {{Cell(0, 0, 4), Cell(0, 1, 4, 4), Cell(0, 2, 4),    Cell(0, 3, 4)},
-//								   {Cell(1, 0, 4), Cell(1, 1, 4),    Cell(1, 2, 4, 3), Cell(1, 3, 4)},
-//								   {Cell(2, 0, 4), Cell(2, 1, 4, 2), Cell(2, 2, 4),    Cell(2, 3, 4)},
-//								   {Cell(3, 0, 4), Cell(3, 1, 4),    Cell(3, 2, 4, 1), Cell(3, 3, 4)}};
-//
-//	vector<string> descs = readFile("test_puzzles.txt");
-//
-//	vector<vector<Cell>> board2 = createBoard(descs[0]);
-//
-//	Board board(board2);
-//	cout << board;
-
-//	Game game(board1, 4, 2);
-//	game.solve();
-//	cout << "Hello, World!" << endl;
 	return 0;
 }
 
