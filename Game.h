@@ -26,7 +26,7 @@ private:
 	
 	std::stack<std::shared_ptr<Command>> commandLog;
 	
-	bool isSolved(int min = 0, int current = 0);
+	bool isSolved();
 	
 	void initializeGame();
 	
@@ -41,7 +41,7 @@ public:
 	
 	Game() = delete;
 	
-	bool solve(int min = 0, int current = 0);
+	bool solve();
 	
 	const Board& getBoard() const;
 	

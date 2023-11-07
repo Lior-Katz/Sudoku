@@ -33,24 +33,20 @@ void Game::initializeGame()
 	});
 }
 
-bool Game::solve(int min, int current)
+bool Game::solve()
 {
 	initializeGame();
 	
-	return isSolved(min, current);
+	return isSolved();
 }
 
-bool Game::isSolved(int min, int current)
+bool Game::isSolved()
 {
 	if (freeCells.empty())
 	{
-		//std::cout << this->board;
 		return true;
 	}
-	if( min != 0 && current >= min)
-	{
-		std::cout << board<< std::endl << std::endl << std::endl;
-	}
+	
 	Cell& cell = *freeCells.front();
 	if (cell.getAvailableValues().empty())
 	{
@@ -67,7 +63,7 @@ bool Game::isSolved(int min, int current)
 			return pCell1->getAvailableValues().size() < pCell2->getAvailableValues().size();
 		});
 		
-		if (isSolved(min, current))
+		if (isSolved())
 		{
 			return true;
 		}
@@ -76,6 +72,7 @@ bool Game::isSolved(int min, int current)
 		commandLog.pop();
 		std::sort(freeCells.begin(), freeCells.end());
 	}
+	
 	freeCells.push_back(&cell);
 	return false;
 }
