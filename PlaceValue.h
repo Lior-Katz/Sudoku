@@ -28,7 +28,7 @@ protected:
 public:
 	PlaceValue(Board& board, Cell& cell, int value);
 	
-	void execute() override;
+	bool execute() override;
 	
 	void undo() override;
 };

@@ -35,7 +35,7 @@ public:
 	
 	void setValue(int newValue);
 	
-	void removeAvailableValue(int valueToDelete);
+	bool removeAvailableValue(int valueToDelete);
 	
 	void addAvailableValue(int valueToAdd);
 	

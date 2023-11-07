@@ -17,7 +17,7 @@ protected:
 public:
 	Command(Cell& pCell, int value);
 	
-	virtual void execute() = 0;
+	virtual bool execute() = 0;
 	
 	virtual void undo() = 0;
 };

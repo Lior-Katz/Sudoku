@@ -42,16 +42,17 @@ int Cell::getY() const
 	return this->y;
 }
 
-void Cell::removeAvailableValue(int valueToDelete)
+bool Cell::removeAvailableValue(int valueToDelete)
 {
 	for (auto it = this->availableValues.begin(); it != this->availableValues.end(); ++it)
 	{
 		if (*it == valueToDelete)
 		{
 			this->availableValues.erase(it);
-			return;
+			return true;
 		}
 	}
+	return false;
 }
 
 void Cell::addAvailableValue(int valueToAdd)

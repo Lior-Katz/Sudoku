@@ -10,30 +10,43 @@ void checkColumn(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>&
 
 void checkBox(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog);
 
-PlaceValue::PlaceValue(Board& board, Cell &cell, int value) :
+PlaceValue::PlaceValue(Board& board, Cell& cell, int value) :
 		Command(cell, value),
 		board(board)
 {
 
 }
 
-void PlaceValue::execute()
+bool PlaceValue::execute()
 {
+//	std::ofstream out("results", std::ios::app);
 	cell.setValue(this->value);
+	
 	updateRowAvailables();
 	updateColumnAvailables();
 	updateBoxAvailables();
+	
+//	out << "set value " << value << " in (" << cell.getX() << ", " << cell.getY() << ")" << std::endl;
+//	out << board << std::endl << std::endl;
+	
+	return true;
 }
 
 void PlaceValue::undo()
 {
+//	std::ofstream out("results", std::ios::app);
 	while (!deductions.empty())
 	{
 		deductions.top()->undo();
 		deductions.pop();
-		cell.removeAvailableValue(value);
-		cell.setValue(0);
+		
 	}
+//	cell.removeAvailableValue(value);
+//	cell.addUsedValues(value);//TODO: delete
+	cell.setValue(0);
+	
+//	out << "undo value " << value << " in " << "(" << cell.getX() << ", " << cell.getY() << ")" << std::endl;
+//	out << board << std::endl << std::endl;
 }
 
 void PlaceValue::updateRowAvailables()
@@ -43,8 +56,10 @@ void PlaceValue::updateRowAvailables()
 		if (board[x][cell.getY()].getValue() == 0)
 		{
 			std::shared_ptr<Command> changeAvailable(new DeleteAvailable(board[x][cell.getY()], value));
-			changeAvailable->execute();
-			deductions.push(changeAvailable);
+			if (changeAvailable->execute())
+			{
+				deductions.push(changeAvailable);
+			}
 		}
 	}
 }
@@ -56,8 +71,10 @@ void PlaceValue::updateColumnAvailables()
 		if (board[cell.getX()][y].getValue() == 0)
 		{
 			std::shared_ptr<Command> changeAvailable(new DeleteAvailable(board[cell.getX()][y], value));
-			changeAvailable->execute();
-			deductions.push(changeAvailable);
+			if (changeAvailable->execute())
+			{
+				deductions.push(changeAvailable);
+			}
 		}
 	}
 }
@@ -74,8 +91,10 @@ void PlaceValue::updateBoxAvailables()
 			if (board[x][y].getValue() == 0)
 			{
 				std::shared_ptr<Command> changeAvailable(new DeleteAvailable(board[x][y], value));
-				changeAvailable->execute();
-				deductions.push(changeAvailable);
+				if (changeAvailable->execute())
+				{
+					deductions.push(changeAvailable);
+				}
 			}
 		}
 	}
