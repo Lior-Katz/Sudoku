@@ -12,36 +12,25 @@ PlaceValue::PlaceValue(Board& board, Cell& cell, int value) :
 
 }
 
-bool PlaceValue::execute()
+void PlaceValue::execute()
 {
-//	std::ofstream out("results", std::ios::app);
 	cell.setValue(this->value);
 	
 	updateRowAvailables();
 	updateColumnAvailables();
 	updateBoxAvailables();
-	
-//	out << "set value " << value << " in (" << cell.getX() << ", " << cell.getY() << ")" << std::endl;
-//	out << board << std::endl << std::endl;
-	
-	return true;
 }
 
 void PlaceValue::undo()
 {
-//	std::ofstream out("results", std::ios::app);
 	while (!deductions.empty())
 	{
 		deductions.top().undo();
 		deductions.pop();
 		
 	}
-//	cell.removeAvailableValue(value);
-//	cell.addUsedValues(value);//TODO: delete
 	cell.setValue(0);
 	
-//	out << "undo value " << value << " in " << "(" << cell.getX() << ", " << cell.getY() << ")" << std::endl;
-//	out << board << std::endl << std::endl;
 }
 
 void PlaceValue::updateRowAvailables()

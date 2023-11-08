@@ -16,23 +16,38 @@ class PlaceValue
 private:
 	Board& board;
 	
-	Cell& cell;
+	Cell& cell; // cell that this command acts upon
 	
-	int value;
+	int value; // value to put in cell
 	
-	std::stack<DeleteAvailable> deductions;
+	std::stack<DeleteAvailable> deductions; // FILO log of all possible value deletions following this placement
 	
+	/**
+	 * removes value from the list of possible values of all cells in the same row
+	 */
 	void updateRowAvailables();
 	
+	/**
+	 * removes value from the list of possible values of all cells in the same column
+	 */
 	void updateColumnAvailables();
 	
+	/**
+	 * removes value from the list of possible values of all cells in the same block
+	 */
 	void updateBoxAvailables();
 
 public:
 	PlaceValue(Board& board, Cell& cell, int value);
 	
-	bool execute();
+	/**
+	 * places value in cell and updates possible value list in every affected cell
+	 */
+	void execute();
 	
+	/**
+	 * undo value placement and all consequent deductions
+	 */
 	void undo();
 };
 
