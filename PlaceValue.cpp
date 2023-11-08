@@ -4,15 +4,10 @@
 
 #include "PlaceValue.h"
 
-void checkRow(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog);
-
-void checkColumn(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog);
-
-void checkBox(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog);
-
 PlaceValue::PlaceValue(Board& board, Cell& cell, int value) :
-		Command(cell, value),
-		board(board)
+		board(board),
+		cell(cell),
+		value(value)
 {
 
 }
@@ -37,7 +32,7 @@ void PlaceValue::undo()
 //	std::ofstream out("results", std::ios::app);
 	while (!deductions.empty())
 	{
-		deductions.top()->undo();
+		deductions.top().undo();
 		deductions.pop();
 		
 	}
@@ -55,8 +50,8 @@ void PlaceValue::updateRowAvailables()
 	{
 		if (board[x][cell.getY()].getValue() == 0)
 		{
-			std::shared_ptr<Command> changeAvailable(new DeleteAvailable(board[x][cell.getY()], value));
-			if (changeAvailable->execute())
+			DeleteAvailable changeAvailable(board[x][cell.getY()], value);
+			if (changeAvailable.execute())
 			{
 				deductions.push(changeAvailable);
 			}
@@ -70,8 +65,8 @@ void PlaceValue::updateColumnAvailables()
 	{
 		if (board[cell.getX()][y].getValue() == 0)
 		{
-			std::shared_ptr<Command> changeAvailable(new DeleteAvailable(board[cell.getX()][y], value));
-			if (changeAvailable->execute())
+			DeleteAvailable changeAvailable(board[cell.getX()][y], value);
+			if (changeAvailable.execute())
 			{
 				deductions.push(changeAvailable);
 			}
@@ -90,8 +85,8 @@ void PlaceValue::updateBoxAvailables()
 			
 			if (board[x][y].getValue() == 0)
 			{
-				std::shared_ptr<Command> changeAvailable(new DeleteAvailable(board[x][y], value));
-				if (changeAvailable->execute())
+				DeleteAvailable changeAvailable(board[x][y], value);
+				if (changeAvailable.execute())
 				{
 					deductions.push(changeAvailable);
 				}

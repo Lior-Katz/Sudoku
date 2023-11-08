@@ -9,7 +9,6 @@
 #include <stack>
 #include <memory>
 #include "Cell.h"
-#include "Command.h"
 #include <iostream>
 #include "PlaceValue.h"
 #include "Board.h"
@@ -24,7 +23,7 @@ private:
 	
 	std::vector<Cell*> freeCells;
 	
-	std::stack<std::shared_ptr<Command>> commandLog;
+	std::stack<PlaceValue> commandLog;
 	
 	bool isSolved();
 	

@@ -5,7 +5,8 @@
 #include "DeleteAvailable.h"
 
 DeleteAvailable::DeleteAvailable(Cell& cell, int value) :
-		Command(cell, value)
+		cell(cell),
+		value(value)
 {
 }
 

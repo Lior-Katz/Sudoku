@@ -5,16 +5,21 @@
 #ifndef SUDOKU_DELETEAVAILABLE_H
 #define SUDOKU_DELETEAVAILABLE_H
 
-#include "Command.h"
+#include "Cell.h"
 
-class DeleteAvailable : public Command
+class DeleteAvailable
 {
+private:
+	Cell& cell;
+	
+	int value;
+
 public:
 	DeleteAvailable(Cell& cell, int value);
 	
-	bool execute() override;
+	bool execute();
 	
-	void undo() override;
+	void undo();
 };
 
 

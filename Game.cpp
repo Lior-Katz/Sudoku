@@ -47,8 +47,8 @@ bool Game::isSolved()
 	freeCells.erase(freeCells.begin());
 	for (int value : cell.getAvailableValues())
 	{
-		std::shared_ptr<Command> placeValue(new PlaceValue(board, cell, value));
-		placeValue->execute();
+		PlaceValue placeValue(board, cell, value);
+		placeValue.execute();
 		commandLog.push(placeValue);
 		std::sort(freeCells.begin(), freeCells.end(), [](const Cell* pCell1, const Cell* pCell2) {
 			return pCell1->getAvailableValues().size() < pCell2->getAvailableValues().size();
@@ -59,7 +59,7 @@ bool Game::isSolved()
 			return true;
 		}
 		
-		commandLog.top()->undo();
+		commandLog.top().undo();
 		commandLog.pop();
 		std::sort(freeCells.begin(), freeCells.end());
 	}
