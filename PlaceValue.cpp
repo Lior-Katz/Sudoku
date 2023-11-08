@@ -81,12 +81,12 @@ void PlaceValue::updateColumnAvailables()
 
 void PlaceValue::updateBoxAvailables()
 {
-	for (int i = 0; i < board.getBoxSize(); ++i)
+	for (int i = 0; i < board.getBlockSize(); ++i)
 	{
-		for (int j = 0; j < board.getBoxSize(); ++j)
+		for (int j = 0; j < board.getBlockSize(); ++j)
 		{
-			int x = cell.getX() - cell.getX() % board.getBoxSize() + i;
-			int y = cell.getY() - cell.getY() % board.getBoxSize() + j;
+			int x = cell.getX() - cell.getX() % board.getBlockSize() + i;
+			int y = cell.getY() - cell.getY() % board.getBlockSize() + j;
 			
 			if (board[x][y].getValue() == 0)
 			{

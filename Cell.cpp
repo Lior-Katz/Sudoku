@@ -4,21 +4,34 @@
 
 #include "Cell.h"
 
-Cell::Cell(int x, int y, int size) :
+Cell::Cell(int x, int y, int boardSize) :
 		x(x),
 		y(y),
-		availableValues(std::vector<int>(size)),
+		availableValues(std::vector<int>(boardSize)),
 		value(0)
 {
+	if (x < 0 || x >= boardSize || y < 0 || y >= boardSize)
+	{
+		throw std::invalid_argument("invalid cell coordinates, must be between 0 and boardSize");
+	}
 	std::iota(availableValues.begin(), availableValues.end(), 1);
 }
 
-Cell::Cell(int x, int y, int size, int value) :
+Cell::Cell(int x, int y, int boardSize, int value) :
 		x(x),
 		y(y),
-		availableValues(std::vector<int>(size)),
+		availableValues(std::vector<int>(boardSize)),
 		value(value)
 {
+	if (x < 0 || x >= boardSize || y < 0 || y >= boardSize)
+	{
+		throw std::invalid_argument("invalid cell coordinates, must be between 0 and boardSize");
+	}
+	if (value < 0 || value > boardSize)
+	{
+		throw std::invalid_argument("invalid value, must be between greater or equal to 0 and smaller than "
+									"boardSize");
+	}
 	std::iota(availableValues.begin(), availableValues.end(), 1);
 }
 
@@ -29,6 +42,10 @@ int Cell::getValue() const
 
 void Cell::setValue(int newValue)
 {
+	if (value < 0)
+	{
+		throw std::invalid_argument("invalid value, must be between greater than or equal to 0 ");
+	}
 	this->value = newValue;
 }
 
@@ -57,6 +74,10 @@ bool Cell::removeAvailableValue(int valueToDelete)
 
 void Cell::addAvailableValue(int valueToAdd)
 {
+	if (value < 0)
+	{
+		throw std::invalid_argument("invalid value, must be between greater than or equal to 0 ");
+	}
 	for (int num : this->availableValues)
 	{
 		if (num == valueToAdd)

@@ -14,7 +14,7 @@ Board::Board(std::vector<std::vector<Cell>>& board) :
 	{
 		++size;
 	}
-	this->boxSize = size;
+	this->blockSize = size;
 }
 
 int Board::getBoardSize() const
@@ -22,9 +22,9 @@ int Board::getBoardSize() const
 	return this->boardSize;
 }
 
-int Board::getBoxSize() const
+int Board::getBlockSize() const
 {
-	return this->boxSize;
+	return this->blockSize;
 }
 
 const std::vector<Cell>& Board::operator[](int x) const
@@ -53,6 +53,13 @@ bool operator==(const Board& first, const Board& second)
 	}
 	
 	return true;
+}
+
+Board::Iterator::Iterator(Board& itBoard, int x, int y) :
+		itBoard(itBoard),
+		x(x),
+		y(y)
+{
 }
 
 bool operator!=(const Board& first, const Board& second)
@@ -142,7 +149,7 @@ std::ostream& operator<<(std::ostream& os, const Board& board)
 			os << std::endl;
 			column = 0;
 			++row;
-			if (row % board.getBoxSize() == 0)
+			if (row % board.getBlockSize() == 0)
 			{
 				for (int i = 0; i < board.getBoardSize(); ++i)
 				{
@@ -151,7 +158,7 @@ std::ostream& operator<<(std::ostream& os, const Board& board)
 				os << std::endl;
 			}
 		}
-		else if (column % board.getBoxSize() == 0)
+		else if (column % board.getBlockSize() == 0)
 		{
 			os << "| ";
 		}
