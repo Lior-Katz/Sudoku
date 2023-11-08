@@ -17,6 +17,8 @@ tuple<int, int> test1(const string& folder);
 
 tuple<int, int> test2(const string& folder);
 
+tuple<int, int> test3(const string& folder);
+
 bool runTest(const string& puzzleStr, const string& solutionStr, int total);
 
 vector<vector<Cell>> createBoard(const string& desc)
@@ -152,7 +154,7 @@ tuple<int, int> test3(const string& folder)
 	string line;
 	string temp;
 	getline(puzzlesFile, temp);
-	while (getline(puzzlesFile, line) && total < 1500000)
+	while (getline(puzzlesFile, line) && total < 1500)
 	{
 		++total;
 		

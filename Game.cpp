@@ -4,13 +4,6 @@
 
 #include "Game.h"
 
-
-void checkRow(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog);
-
-void checkColumn(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog);
-
-void checkBox(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog);
-
 void Game::initializeGame()
 {
 	for (Cell& cell : board)
@@ -19,13 +12,11 @@ void Game::initializeGame()
 		{
 			freeCells.push_back(&cell);
 		}
-	}
-	
-	for (Cell* pCell : freeCells)
-	{
-		checkRow(board, *pCell, commandLog);
-		checkColumn(board, *pCell, commandLog);
-		checkBox(board, *pCell, commandLog);
+		else
+		{
+			PlaceValue placeValue(this->board, cell, cell.getValue());
+			placeValue.execute();
+		}
 	}
 	
 	std::sort(freeCells.begin(), freeCells.end(), [](const Cell* pCell1, const Cell* pCell2) {
@@ -80,60 +71,4 @@ bool Game::isSolved()
 const Board& Game::getBoard() const
 {
 	return this->board;
-}
-
-//TODO: get rid of code duplication between checking row, column and box; in PlaceValue::execute()
-void checkRow(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog)
-{
-	for (int i = 0; i < board.getBoardSize(); ++i)
-	{
-		if (i == cell.getX())
-		{
-			continue;
-		}
-		
-		if (board[i][cell.getY()].getValue() != 0)
-		{
-			cell.removeAvailableValue(board[i][cell.getY()].getValue());
-		}
-	}
-}
-
-void checkColumn(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog)
-{
-	for (int i = 0; i < board.getBoardSize(); ++i)
-	{
-		if (i == cell.getY())
-		{
-			continue;
-		}
-		
-		if (board[cell.getX()][i].getValue() != 0)
-		{
-			
-			cell.removeAvailableValue(board[cell.getX()][i].getValue());
-		}
-	}
-}
-
-void checkBox(Board& board, Cell& cell, std::stack<std::shared_ptr<Command>>& commandLog)
-{
-	for (int i = 0; i < board.getBoxSize(); ++i)
-	{
-		for (int j = 0; j < board.getBoxSize(); ++j)
-		{
-			int x = cell.getX() - cell.getX() % board.getBoxSize() + i;
-			int y = cell.getY() - cell.getY() % board.getBoxSize() + j;
-			
-			if (cell.getX() == x && cell.getY() == y)
-			{
-				continue;
-			}
-			
-			if (board[x][y].getValue() != 0)
-			{
-				cell.removeAvailableValue(board[x][y].getValue());
-			}
-		}
-	}
 }
