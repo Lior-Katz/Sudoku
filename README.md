@@ -1,4 +1,4 @@
-To run the sudoku solver, a command_line argument must be passed specifying the number of tests to run.
+To run the sudoku solver, a command-line argument must be passed specifying the number of tests to run.
 In the Testing directory, 3 default tests are provided. By default, only the first 2 will run, as the third test contains a very large number of tests and as such will cause an unreasonable runtime.
 
 It is possible to provide custom tests. This requires providing an implementation of the getTestCases function in a TestParser.cpp file. This ensures that any format of puzzle representation can be handled.
